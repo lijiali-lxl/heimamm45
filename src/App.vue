@@ -1,7 +1,6 @@
 <template>
   <div id="app">
 
- <el-button type="success">成功按钮</el-button>
     <router-view></router-view>
   </div>
 </template>
@@ -13,5 +12,7 @@ name:'app'
 </script>
 
 <style>
-
+#app{
+  height: 100%;
+}
 </style>
