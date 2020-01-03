@@ -87,6 +87,7 @@ export default {
          password:'',
          code:'',
          checked:false,
+         dialogFormVisible:false
         },
         rules: {
           phone: [
@@ -94,11 +95,11 @@ export default {
           ],
            password: [
             { required: true, message: '请输入密码', trigger: 'blur' },
-            { min: 6, max: 12, message: '长度在 6 到12个字符', trigger: 'change' }
+            { min: 6, max: 12, message: '长度在 6 到12个字符', trigger: 'blur' }
           ],
            code: [
             { required: true, message: '请输入验证码', trigger: 'blur' },
-            { min: 4, max: 4, message: '长度必须为四位', trigger: 'change' }
+            { min: 4, max: 4, message: '长度必须为四位', trigger: 'blur' }
           ],
          
         }
@@ -107,8 +108,14 @@ export default {
     methods: {
       submitForm(formName) {
         //调axios接口验证信息对不对
-       if (this.ruleForm.checked==true) {
-          axios({
+        if (this.ruleForm.checked==false) {
+            this.$message.error("请先勾选协议噢")
+            return
+        }
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+          // this.$message.success('验证成功')
+            axios({
           url:process.env.VUE_APP_BASEURL+'/login',
           method:'post',
           withCredentials:true,
@@ -128,10 +135,6 @@ export default {
             this.$message.error(res.data.message)
           } }
         });
-       }
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-          // this.$message.success('验证成功')
           } else {
             this.$message.error('验证失败')
             return false;
@@ -140,6 +143,7 @@ export default {
       },
       resetForm(formName) {
         this.$refs[formName].resetFields();
+  
       },
       codeChange(){
         //在地址后面加上&t=+date.now()时间戳可以改变随机验证码
