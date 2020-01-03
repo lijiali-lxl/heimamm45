@@ -34,13 +34,13 @@
             </el-col>
             <el-col class="code-col" :span="6">
               <!-- 一部分 -->
-              <img :src="codeUrl" alt="" />
+              <img :src="codeUrl" alt="" @click="codeChange" />
             </el-col>
           </el-row>
         </el-form-item>
         <!-- 协议 -->
         <el-form-item>
-          <el-checkbox  v-model="checked">
+          <el-checkbox  v-model="ruleForm.checked">
             我已阅读并同意
             <el-link type="primary">用户协议</el-link>
             <span>和</span>
@@ -58,6 +58,8 @@
 </template>
 
 <script>
+
+import axios from 'axios'
   const validatephone = (rule, value, callback) => {
         if (value === '') {
           callback(new Error('请输入手机号码'));
@@ -84,6 +86,7 @@ export default {
           phone: '',
          password:'',
          code:'',
+         checked:false,
         },
         rules: {
           phone: [
@@ -103,9 +106,32 @@ export default {
     },
     methods: {
       submitForm(formName) {
+        //调axios接口验证信息对不对
+       if (this.ruleForm.checked==true) {
+          axios({
+          url:process.env.VUE_APP_BASEURL+'/login',
+          method:'post',
+          withCredentials:true,
+
+          data: { 
+            phone:this.ruleForm.phone,
+            password:this.ruleForm.password,
+            code:this.ruleForm.code,
+          },
+        }).then(res=>{
+          //成功回调
+          window.console.log(res)
+          if (res.data.code==200) {
+            this.$message.success('验证成功')
+          }else {
+            if(res.data.code==202){
+            this.$message.error(res.data.message)
+          } }
+        });
+       }
         this.$refs[formName].validate((valid) => {
           if (valid) {
-          this.$message.success('验证成功')
+          // this.$message.success('验证成功')
           } else {
             this.$message.error('验证失败')
             return false;
@@ -114,6 +140,12 @@ export default {
       },
       resetForm(formName) {
         this.$refs[formName].resetFields();
+      },
+      codeChange(){
+        //在地址后面加上&t=+date.now()时间戳可以改变随机验证码
+        // this.codeUrl=process.env.VUE_APP_BASEURL+"/captcha?type=login&t="+Date.now()
+        //在地址后面加上&=+math.random可以产生随机数
+        this.codeUrl=process.env.VUE_APP_BASEURL+'/captcha?type=login&t='+Math.random()
       }
     }
 };
@@ -174,6 +206,7 @@ export default {
         img{
           width: 100%;
           height: 100%;
+          cursor: pointer;
         }
       }
       // 更高的文本框
