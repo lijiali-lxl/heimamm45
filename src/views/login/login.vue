@@ -9,31 +9,38 @@
         <div class="sub-title">用户登录</div>
       </div>
 
-      <el-form>
-        <el-form-item class="phoneNumber">
-          <el-input v-model="input1" prefix-icon="el-icon-user" placeholder="请输入手机号"></el-input>
+      <el-form
+        :model="ruleForm"
+        :rules="rules"
+        ref="ruleForm"
+        label-width="43px"
+        class="demo-ruleForm login-form"
+      >
+      <!-- 手机号码验证 -->
+        <el-form-item  prop="phone">
+          <el-input class="high-input" v-model="ruleForm.phone" placeholder="请输入手机号码" prefix-icon="el-icon-user" ></el-input>
         </el-form-item>
-        <el-form-item>
-          <el-input
-            placeholder="请输入密码"
-            v-model="input"
-            show-password
-            prefix-icon="el-icon-lock"
-            class="password"
-          ></el-input>
+        <!-- 密码验证 -->
+        <el-form-item  prop="password">
+          <el-input class="high-input" v-model="ruleForm.password" show-password placeholder="请输入密码" prefix-icon="el-icon-lock" ></el-input>
         </el-form-item>
-        <el-form-item>
+        
+        <!-- 验证码 -->
+        <el-form-item prop="code">
           <el-row>
-            <el-col class="col1" :span="17">
-              <el-input placeholder="请输入验证码" prefix-icon="el-icon-key" v-model="input2"></el-input>
+            <!-- 验证码 -->
+            <el-col :span="18">
+              <el-input class="high-input" prefix-icon="el-icon-key" v-model="ruleForm.code" placeholder="请输入验证码"></el-input>
             </el-col>
-            <el-col class="col2" :span="7"> <img
-               
-              /></el-col>
+            <el-col class="code-col" :span="6">
+              <!-- 一部分 -->
+              <img :src="codeUrl" alt="" />
+            </el-col>
           </el-row>
         </el-form-item>
+        <!-- 协议 -->
         <el-form-item>
-          <el-checkbox v-model="checked" class="Tcp">
+          <el-checkbox  v-model="checked">
             我已阅读并同意
             <el-link type="primary">用户协议</el-link>
             <span>和</span>
@@ -41,29 +48,74 @@
           </el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" class="my-btn">登录</el-button>
+          <el-button class="login-btn" type="primary" @click="submitForm('ruleForm')">登录</el-button>
+          <el-button class="login-btn reset-btn" type="primary" @click="resetForm('ruleForm')">注册</el-button>
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" class="my-btn">注册</el-button>
-        </el-form-item>
-      </el-form>
+  </el-form>
     </div>
     <img src="../../assets/login_banner_ele.png" alt />
   </div>
 </template>
 
 <script>
+  const validatephone = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请输入手机号码'));
+        } else {
+         const reg=/^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/
+          if(reg.test(value)==true){
+                callback();
+          }
+          else{
+            callback(new Error('小老弟，手机号码错了'))
+          //判断正则
+          
+          }
+          
+        }
+      };
 export default {
-  data() {
-    return {
-      input: "",
-      input1: "",
-      input2: "",
-      checked: "",
-      actions:''
-    };
-  },
-  
+   data() {
+    
+      return {
+         //验证码地址：
+        codeUrl:process.env.VUE_APP_BASEURL+'/captcha?type=login',
+        ruleForm: {
+          phone: '',
+         password:'',
+         code:'',
+        },
+        rules: {
+          phone: [
+            { validator: validatephone, trigger: 'blur' }
+          ],
+           password: [
+            { required: true, message: '请输入密码', trigger: 'blur' },
+            { min: 6, max: 12, message: '长度在 6 到12个字符', trigger: 'change' }
+          ],
+           code: [
+            { required: true, message: '请输入验证码', trigger: 'blur' },
+            { min: 4, max: 4, message: '长度必须为四位', trigger: 'change' }
+          ],
+         
+        }
+      };
+    },
+    methods: {
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+          this.$message.success('验证成功')
+          } else {
+            this.$message.error('验证失败')
+            return false;
+          }
+        });
+      },
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
+      }
+    }
 };
 </script>
 
@@ -113,41 +165,35 @@ export default {
     font-size: 22px;
     font-weight: 400;
   }
-  .phoneNumber {
-    width: 394px;
-    height: 49px;
-    margin-left: 43px;
-    margin-top: 31px;
-  }
-  .password {
-    height: 47px;
-    width: 394px;
-    // margin-top: 25px;
-    margin-left: 43px;
-  }
-  .col1 {
-    width: 284px;
-    height: 48px;
-    margin-left: 42px;
-    // margin-top: 26px;
-    // margin-bottom: 32px;
-  }
-  .Tcp {
+  .login-form{
+      padding-right: 41px;
+      margin-top: 27px;
+      // 栅格 验证码
+      .code-col {
+        height: 40px;
+        img{
+          width: 100%;
+          height: 100%;
+        }
+      }
+      // 更高的文本框
+      .high-input >input{
+        height: 45px;
+        line-height: 45px
+      }
+      // 表单内部的 按钮
+    .login-btn {
+      width: 100%;
+      margin-left: 0;
+    }
+    .reset-btn{
+      margin-top: 28px;
+    }
+    .Tcp {
     margin-left: 44px;
   }
-  .my-btn {
-    width: 394px;
-    height: 44px;
-    margin-bottom: 20px;
-    margin-left: 43px;
-  }
-//   .my-btn + .my-btn {
-//     margin: 0;
-//   }
-.col2{
-    width: 110px;
-    height: 38px;
-    background-color: pink
-}
+    }
+    
+  
 }
 </style>

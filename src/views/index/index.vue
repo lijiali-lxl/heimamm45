@@ -9,9 +9,9 @@
         <div class="sub-title">用户登录</div>
       </div>
 
-      <el-form>
-        <el-form-item class="phoneNumber" prop="phone">
-          <el-input v-model="input1" prefix-icon="el-icon-user" placeholder="请输入手机号"></el-input>
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
+        <el-form-item  prop="phoneNumber">
+          <el-input v-model="input1" prefix-icon="el-icon-user" placeholder="请输入手机号" class="phoneNumber"></el-input>
         </el-form-item>
         <el-form-item>
           <el-input
@@ -28,10 +28,7 @@
               <el-input placeholder="请输入验证码" prefix-icon="el-icon-key" v-model="input2"></el-input>
             </el-col>
             <el-col class="col2" :span="7"> <img
-                class="captcha"
                
-                :src="actions"
-                alt=""
               /></el-col>
           </el-row>
         </el-form-item>
@@ -67,14 +64,8 @@ export default {
     };
   },
   methods: {
-   
+    
   },
-  rules:{
-    phone: [
-          { required: true, message: "手机号不能为空" },
-        //   { validator: checkMobile }
-        ],
-  }
 };
 </script>
 
