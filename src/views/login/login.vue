@@ -74,7 +74,7 @@
       <img src="../../assets/login_banner_ele.png" alt />
     </div>
     <!-- 注册用户会话 -->
-    <el-dialog title="用户注册" :visible.sync="dialogFormVisible">
+    <el-dialog title="用户注册" center :visible.sync="dialogFormVisible">
       <el-form
         :model="regForm"
         :rules="rules"
@@ -112,33 +112,35 @@
             <el-col :span="14">
               <el-input v-model="regForm.rcode"></el-input>
             </el-col>
-            <el-col :span="10">
+            <el-col :span="9" :offset="1">
               <img :src="regcodeUrl" alt @click="changeregCode" />
             </el-col>
           </el-row>
         </el-form-item>
+        <!-- 手机验证码 -->
         <el-form-item label="验证码" prop="phonecode" :label-width="formLabelWidth">
           <el-row>
-            <el-col :span="17">
+            <el-col :span="14">
               <el-input v-model="regForm.phonecode"></el-input>
             </el-col>
-            <el-col :span="7">
-              <el-button @click="getphoneCode">获取用户验证码</el-button>
+            <el-col :span="9" :offset="1">
+              <el-button @click="getphoneCode" :disabled="delaytime !=0">{{getmsg}}</el-button>
             </el-col>
           </el-row>
         </el-form-item>
-
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="register">确 定</el-button>
+        <div class="footer">
+          <el-button @click="resetRgeForm">取 消</el-button>
+          <el-button type="primary" @click="register">确 定</el-button>
+        </div>
       </el-form>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import axios from "axios";
 
-import {login} from '../../api/login.js'
+
+import { login, phoneCode, getregCode} from "../../api/login.js";
 const validatephone = (rule, value, callback) => {
   if (value === "") {
     callback(new Error("请输入手机号码"));
@@ -172,6 +174,11 @@ export default {
       //验证码地址：
       regcodeUrl: process.env.VUE_APP_BASEURL + "/captcha?type=sendsms",
       codeUrl: process.env.VUE_APP_BASEURL + "/captcha?type=login",
+
+      //注册信息
+      getmsg: "获取用户验证码",
+      delaytime: 0,
+      disable: false,
       ruleForm: {
         phone: "",
         password: "",
@@ -182,7 +189,7 @@ export default {
       imgPath: "",
       dialogFormVisible: false,
       // 头像上传地址
-      
+
       regForm: {
         name: "",
         imgIcon: "",
@@ -205,20 +212,20 @@ export default {
           { min: 4, max: 4, message: "长度必须为四位", trigger: "blur" }
         ],
         rcode: [
-          { required: true, message: "请输入", trigger: "blur" },
+          { required: true, message: "请输入手机验证码", trigger: "blur" },
           { min: 4, max: 4, message: "长度必须为四位", trigger: "blur" }
         ],
         name: [
           { required: true, message: "请输入你的名称", trigger: "blur" },
-          { min: 2, max: 6, trigger: "blur" }
+          { min: 2,  trigger: "blur",message: "名称至少两位噢", }
         ],
         email: [
-          { required: true, message: "请输入验证码", trigger: "blur" },
+          { required: true, message: "请输入邮箱号", trigger: "blur" },
           { validator: validateEmail, trigger: "blur" }
         ],
         imgIcon: [
-          { required: true, message: "请输入验证码", trigger: "blur" },
-          { min: 4, max: 4, message: "长度必须为四位", trigger: "blur" }
+          { required: true, message: "请输入头像，头像不能为空", trigger: "blur" },
+          
         ]
       },
       formLabelWidth: "80px"
@@ -234,16 +241,19 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           // this.$message.success('验证成功')
-        login({
-          phone: this.ruleForm.phone,
-          password: this.ruleForm.password,
-          code: this.ruleForm.code
-        })
-        .then(res => {
+          login({
+            phone: this.ruleForm.phone,
+            password: this.ruleForm.password,
+            code: this.ruleForm.code
+          }).then(res => {
             //成功回调
             window.console.log(res);
             if (res.data.code == 200) {
-              this.$message.success("验证成功");
+              this.$message.success("登录成功");
+              //把token存起来
+              window.localStorage.setItem('token',res.data.data.token)
+              //路由跳转到首页
+              this.$router.push('/index')
             } else {
               if (res.data.code == 202) {
                 this.$message.error(res.data.message);
@@ -260,7 +270,7 @@ export default {
       this.dialogFormVisible = true;
       this.$refs[formName].resetFields();
       this.regcodeUrl =
-        process.env.VUE_APP_BASEURL + "/captcha?type=login&t=" + Date.now();
+        process.env.VUE_APP_BASEURL + "/captcha?type=sendsms&t=" + Date.now();
     },
     codeChange() {
       //在地址后面加上&t=+date.now()时间戳可以改变随机验证码
@@ -273,7 +283,7 @@ export default {
     handleAvatarSuccess(res, file) {
       this.imageUrl = URL.createObjectURL(file.raw);
       this.imgPath = res.data.file_path;
-
+      this.regForm.imgIcon=this.imgPath
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
@@ -295,40 +305,85 @@ export default {
 
     //点击注册用户的确认按钮
     register() {
-      axios({
-        url: process.env.VUE_APP_BASEURL + "/register",
-        method: "post",
-        withCredentials: true,
-        data: {
-          username: this.regForm.name,
+         this.$refs.regForm.validate((valid) => {
+          if (valid) {
+           getregCode({
+              username: this.regForm.name,
           phone: this.regForm.phone,
           email: this.regForm.email,
           avatar: this.imgPath,
           password: this.regForm.password,
-          rcode: this.regForm.rcode
-        }
+          rcode: this.regForm.phonecode
+           })
+         
+        
+      .then(res => {
+        //成功回调
+        this.$message.success('恭喜你注册成功')
+        this.dialogFormVisible=false
+        window.console.log(res);
+
+      });
+          } else {
+            window.console.log('error submit!!');
+            return false;
+          }
+        });
+      
+    },
+    //点击获取验证码的时候调用接口
+    getphoneCode() {
+      if (this.regForm.rcode.length != 4) {
+        this.$message.error("验证码长度不对噢");
+        return;
+      }
+      //设置一个倒计时信息
+      if (this.delaytime ==0) {
+        this.delaytime=60
+      
+        const timeInter = setInterval(() => {
+          this.delaytime--;
+          this.getmsg = `剩下还有${this.delaytime}噢`;
+          if (this.delaytime == 0) {
+            clearInterval(timeInter);
+       this.getmsg='获取验证码'
+          }
+        }, 10);
+      }
+      
+        //获取手机注册码
+      phoneCode({
+        code:this.regForm.rcode,
+        phone: this.regForm.phone
       }).then(res => {
         //成功回调
         window.console.log(res);
+       
+        if (res.data.data.captcha==undefined) {
+       
+        this.$message.warning(res.data.message)
+      
+        }
+        else{
+           
+        //  alert(res.data.data.captcha);
+         
+        this.$message.success("验证码是："+res.data.data.captcha)
+      
+        }
+         
       });
     },
-    //点击获取验证码的时候调用接口
-    getphoneCode(){
-      axios({
-        url:process.env.VUE_APP_BASEURL+'/sendsms',
-        method:'post',
-        withCredentials:true,
-        data: { 
-           code: this.regForm.rcode,
-           phone:18520409113,
-        },
-      
-      }).then(res=>{
-        //成功回调
-        window.console.log(res)
-      });
-    }
+    //点击取消的时候重置注册表单
+  resetRgeForm(){
+     this.$refs.regForm.resetFields();
+     
+    
+     this.imageUrl=''
+     this.dialogFormVisible=false
   }
+  },
+  
 };
 </script>
 
@@ -440,6 +495,9 @@ export default {
     background: rgba(15, 159, 250);
   }
   .avatar-uploader {
+    text-align: center;
+  }
+  .footer {
     text-align: center;
   }
 }
