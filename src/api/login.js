@@ -19,13 +19,10 @@ export function login(data){
 //抽查注册验证码接口
 export function phoneCode(data){
     return axios({
-        // url: 'http://183.237.67.218:3002/sendsms',
         url: process.env.VUE_APP_BASEURL + '/sendsms',
         method: "post",
         withCredentials: true,
         data,
-
-    
       })
       
 }
