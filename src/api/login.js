@@ -1,4 +1,5 @@
 import axios from 'axios'
+// import token from '../../utils/token.js'
 
 
 //抽查login登录接口
@@ -37,3 +38,29 @@ export function getregCode(data){
       })
       
 }
+
+
+
+//抽取获取用户信息接口
+export function info(){
+  return axios({
+      url:process.env.VUE_APP_BASEURL+'/info',
+      method:'get',
+   headers:{
+      token: window.localStorage.getItem('token')
+   }
+   
+    })
+}
+//抽取登录退出接口
+export function logout(){
+  return axios({
+      url:process.env.VUE_APP_BASEURL+'/logout',
+      method:'get',
+   headers:{
+      token: window.localStorage.getItem('token')
+   }
+   
+    })
+}
+

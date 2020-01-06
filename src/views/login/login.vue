@@ -141,6 +141,7 @@
 
 
 import { login, phoneCode, getregCode} from "../../api/login.js";
+import {saveToken} from '../../utils/token'
 const validatephone = (rule, value, callback) => {
   if (value === "") {
     callback(new Error("请输入手机号码"));
@@ -251,7 +252,7 @@ export default {
             if (res.data.code == 200) {
               this.$message.success("登录成功");
               //把token存起来
-              window.localStorage.setItem('token',res.data.data.token)
+            saveToken(res.data.data.token)
               //路由跳转到首页
               this.$router.push('/index')
             } else {

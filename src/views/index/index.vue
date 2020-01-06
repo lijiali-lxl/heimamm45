@@ -3,7 +3,7 @@
     <!-- 头部盒子 -->
   <el-header class="header-box" >
     <div class="left ">
-      <i class="el-icon-s-fold icon"></i>
+      <i class="el-icon-s-fold icon" @click="kaiguan=!kaiguan"></i>
       <img class="login" src="../../assets/index-login.png" alt="" >
       <span class='title'>黑马面面</span>
     </div>
@@ -16,7 +16,42 @@
   </el-header>
   <el-container>
     <!-- 左边盒子 -->
-    <el-aside width="200px" class="left-box">Aside</el-aside>
+    <el-aside width="auto" class="left-box">
+       <!-- <el-col :span="24"> -->
+            <el-menu
+              default-active="2"
+              class="el-menu-vertical-demo"
+              :collapse='kaiguan'
+              
+            >
+              <el-menu-item index="1">
+                <i class="el-icon-pie-chart"></i>
+                <span slot="title">数据概览</span>
+              </el-menu-item>
+             
+              <el-menu-item index="2">
+                <i class="el-icon-user"></i>
+                <span slot="title">用户列表</span>
+              </el-menu-item>
+             
+              <el-menu-item index="3">
+                <i class="el-icon-edit-outline"></i>
+                <span slot="title">题库列表</span>
+              </el-menu-item>
+             
+              <el-menu-item index="4">
+                <i class="el-icon-notebook-2"></i>
+                <span slot="title">企业列表</span>
+              </el-menu-item>
+             
+              <el-menu-item index="5">
+                <i class="el-icon-office-building"></i>
+                <span slot="title">学科列表</span>
+              </el-menu-item>
+             
+            </el-menu>
+          <!-- </el-col> -->
+    </el-aside>
     <!-- 右边盒子 -->
     <el-main class="right-box">Main</el-main>
   </el-container>
@@ -25,18 +60,39 @@
 </template>
 
 <script>
-import {info} from '../../api/index'
+import {info,logout} from '../../api/login'
+//引入移出token工具
+import { removeToken } from '../../utils/token';
 // import axios from 'axios'
 export default {
   data() {
     return {
-      userInfo:{}
+      userInfo:{},
+       kaiguan: false
     }
   },
 methods: {
+  //点击退出按钮
  exitBtn(){
   //  window.localStorage.removeItem('token')
-   this.$router.push('/login')
+  this.$confirm("你确定要退出我们的黑马面面嘛？", '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          //确定退出
+        logout().then(res=>{
+          //成功回调
+          if (res.data.code==200) {
+                removeToken()
+         this.$router.push('/login')
+          }
+        });
+      
+        }).catch(() => {
+                  
+        });
+   
  }
 },
  created() {
@@ -55,6 +111,10 @@ methods: {
 </script>
 
 <style lang='less'>
+*{
+  margin: 0;
+  padding: 0;
+}
 html,body{
   height: 100%;
 }
@@ -103,8 +163,10 @@ html,body{
   //左边盒子
   .left-box{
 
-    width: 201px;
-    background-color: brown
+ .el-menu-vertical-demo:not(.el-menu--collapse) {
+    width: 200px;
+    min-height: 400px;
+  }
   }
   .right-box{
     background-color: rgb(32, 218, 218)
