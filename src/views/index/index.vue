@@ -70,7 +70,8 @@ export default {
   data() {
     return {
       userInfo:{},
-       kaiguan: false
+       kaiguan: false,
+       
     }
   },
 methods: {
@@ -171,7 +172,7 @@ html,body{
   }
   }
   .right-box{
-    background-color: rgb(32, 218, 218)
+   background-color: #E8E9EC;
   }
  
 }
