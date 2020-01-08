@@ -99,12 +99,12 @@ methods: {
  }
 },
  created() {
-    window.console.log('11111')
+    
     //请求用户信息
     info()
     .then(res=>{
         //成功回调
-        window.console.log(res)
+       
         this.userInfo=res.data.data
         this.userInfo.avatar= process.env.VUE_APP_BASEURL+'/'+ this.userInfo.avatar
 

@@ -10,11 +10,7 @@ export function login(data){
         withCredentials: true,
         data,
 
-        // data: {
-        //   phone: this.ruleForm.phone,
-        //   password: this.ruleForm.password,
-        //   code: this.ruleForm.code
-        // }
+    
       })
 }
 //抽查注册验证码接口
