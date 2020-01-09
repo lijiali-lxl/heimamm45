@@ -7,7 +7,7 @@ export function saveToken(token){
 
 //取token
 export function getToken(){
-  return  window.localStorage.getItem(key,)
+  return  window.localStorage.getItem(key)
 }
 
 

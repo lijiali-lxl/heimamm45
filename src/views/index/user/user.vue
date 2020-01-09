@@ -3,22 +3,23 @@
     <!-- 饿了吗的卡片 -->
     <!-- 头部 -->
     <el-card class="box-card">
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item label="用户名称">
-          <el-input v-model="formInline.user"></el-input>
+      <el-form :inline="true" :model="userfrom" class="demo-form-inline">
+        <el-form-item label="用户名称" prop="username">
+          <el-input v-model="userfrom.user"></el-input>
         </el-form-item>
-        <el-form-item label="用户邮箱">
-          <el-input v-model="formInline.user"></el-input>
+        <el-form-item label="用户邮箱" prop="email">
+          <el-input v-model="userfrom.email"></el-input>
         </el-form-item>
-      
-        <el-form-item label="角色">
-          <el-select v-model="formInline.region" placeholder="请选择状态">
-            <el-option label="已审批" value="shanghai"></el-option>
-            <el-option label="待审批" value="beijing"></el-option>
+
+        <el-form-item label="角色" prop="role_id">
+          <el-select v-model="userfrom.role_id" placeholder="请选择状态">
+            <el-option label="管理员" value="2"></el-option>
+            <el-option label="老师" value="3"></el-option>
+            <el-option label="学生" value="4"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">查询</el-button>
+          <el-button type="primary" @click="search">查询</el-button>
           <el-button @click="onSubmit">清除</el-button>
           <el-button type="primary" icon="el-icon-plus" @click="onSubmit">新增用户</el-button>
         </el-form-item>
@@ -29,17 +30,33 @@
     <el-card>
       <el-table :data="tableData" stripe style="width: 100%">
         <el-table-column type="index" label="序号" width="100"></el-table-column>
-        <el-table-column prop="date" label="用户名" width="180"></el-table-column>
-        <el-table-column prop="name" label="电话" width="180"></el-table-column>
-        <el-table-column prop="date" label="邮箱"></el-table-column>
-        <el-table-column prop="date" label="角色"></el-table-column>
-        <el-table-column prop="date" label="备注"></el-table-column>
-        <el-table-column prop="date" label="状态"></el-table-column>
+        <el-table-column prop="username" label="用户名" width="180"></el-table-column>
+        <el-table-column prop="phone" label="电话" width="180"></el-table-column>
+        <el-table-column prop="email" label="邮箱"></el-table-column>
+        <el-table-column prop="role_id" label="角色">
+          <template slot-scope="scope">
+            <span v-if="scope.row.role_id==2">管理员</span>
+            <span v-else-if="scope.row.role_id==3">老师</span>
+            <span v-else>学生</span>
+            <!-- <span>{{scope.row.role_id}}</span> -->
+          </template>
+        </el-table-column>
+        <el-table-column prop="remark" label="备注"></el-table-column>
+        <el-table-column prop="status" label="状态">
+          <template slot-scope="scope">
+            <span v-if="scope.row.status==1">启用</span>
+            <span v-else>禁用</span>
+          </template>
+        </el-table-column>
         <el-table-column fixed="right" label="操作" width="120">
           <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small">编辑</el-button>
-            <el-button type="text" size="small">禁用</el-button>
-            <el-button type="text" size="small">删除</el-button>
+            <el-button @click="edituser(scope.row)" type="text" size="small">编辑</el-button>
+            <el-button
+              type="text"
+              size="small"
+              @click="change(scope.row)"
+            >{{scope.row.status==0?'启用':'禁用'}}</el-button>
+            <el-button type="text" size="small" @click="del(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -55,109 +72,50 @@
         :total="400"
       ></el-pagination>
     </el-card>
-
-    <!-- 新增对话框 -->
-    <el-dialog title="新增用户" :visible.sync="dialogFormVisible" class="addwindow" center>
-      <el-form
-        :model="ruleForm"
-        :rules="rules"
-        ref="ruleForm"
-        label-width="100px"
-        class="demo-ruleForm"
-      >
-        <el-form-item label="用户名" :label-width="formLabelWidth" prop="username">
-          <el-input v-model="ruleForm.username" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="邮箱" :label-width="formLabelWidth" prop="email">
-          <el-input v-model="ruleForm.email" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="电话" :label-width="formLabelWidth" prop="phone">
-          <el-input v-model="ruleForm.phone" autocomplete="off"></el-input>
-        </el-form-item>
-       <el-form-item label="角色" prop="role" :label-width="formLabelWidth">
-          <el-select v-model="ruleForm.role" placeholder="请选择角色">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth">
-          <el-select v-model="ruleForm.region" placeholder="请选择状态">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
-        </el-form-item>
-
-
-
-        <el-form-item label="用户备注" :label-width="formLabelWidth">
-          <el-input v-model="ruleForm.name" autocomplete="off"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="resetForm('ruleForm')">取 消</el-button>
-        <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
-      </div>
-    </el-dialog>
+    <!-- 使用adduser会话框 -->
+    <adduser ref="adduser"></adduser>
+    <edituser ref="edituser"></edituser>
   </div>
 </template>
 
 <script>
+import adduser from "../user/components/adduser";
+import edituser from "../user/components/edituser";
+import { userList, delUser, changeUser } from "@/api/user.js";
 export default {
+  components: {
+    adduser,
+    edituser
+  },
+  created() {
+    this.list();
+  },
   data() {
     return {
-      formInline: {
-        user: "",
-        region: ""
+      userfrom: {
+        username: "",
+        email: "",
+        role_id:''
       },
-      tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄"
-        },
-   
-      ],
+      tableData: [],
       //分页插件
       currentPage1: 5,
       currentPage2: 5,
       currentPage3: 5,
-      currentPage4: 4,
+      currentPage4: 4
 
       //对话框
-      dialogTableVisible: false,
-      dialogFormVisible: false,
-      ruleForm: {
-        username: "",
-        email: "",
-        phone: "",
-        role: ""
-      },
-      rules: {
-        username: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ],
-        email: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ],
-        phone: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ],
-        role: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ]
-      },
-      formLabelWidth: "80px"
     };
   },
   methods: {
+    list() {
+      userList().then(res => {
+        this.tableData = res.data.data.items;
+      });
+    },
     //新增按钮
     onSubmit() {
-      this.dialogTableVisible = true;
-      this.dialogFormVisible = true;
+      this.$refs.adduser.dialogFormVisible = true;
     },
     //分页
     handleSizeChange(val) {
@@ -167,23 +125,57 @@ export default {
     handleCurrentChange(val) {
       window.console.log(`当前页: ${val}`);
     },
-    //点击会话框确定按钮
-    submitForm(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          alert("submit!");
-        } else {
-          window.console.log("error submit!!");
-          return false;
+    //删除按钮
+    del(item) {
+      delUser({
+        id: item.id
+      }).then(res => {
+        window.console.log(res);
+        window.console.log("删除成功");
+        if (res.data.code == 200) {
+          this.$message.success("删除成功");
+          this.list();
         }
       });
     },
-    //点击取消按钮
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-      this.dialogFormVisible = false;
-    }
+    //状态切换
+    change(item) {
+      changeUser({
+        id: item.id
+      }).then(res => {
+        window.console.log(res)
+        this.list();
+      });
+    },
+    //编辑按钮
+    edituser(item){
+      this.$refs.edituser.dialogFormVisible=true
+      this.$refs.edituser.usereditfrom=JSON.parse(JSON.stringify(item))
+      if (item.role_id==3) {
+        this.$refs.edituser.usereditfrom.role_id='老师'
+      }else if (item.role_id==2) {
+          this.$refs.edituser.usereditfrom.role_id='管理员'
+      }else if (item.role_id==4){
+         this.$refs.edituser.usereditfrom.role_id='学生'
+      }else if (item.role_id==1){
+         this.$refs.edituser.usereditfrom.role_id='学生'
+      }
+      if (item.status==1) {
+        this.$refs.edituser.usereditfrom.status='启用'
+      }else{
+         this.$refs.edituser.usereditfrom.status='禁用'
+      }
+      },
+       //查询按钮
+  search(){
+   this.list(this.userfrom)
   }
+     
+        
+      
+    
+  },
+ 
 };
 </script>
 
@@ -204,9 +196,8 @@ export default {
   .el-dialog__header {
     background: linear-gradient(to right, rgb(2, 192, 250), rgb(17, 154, 250));
   }
-.el-form demo-ruleForm{
-  margin-left: 20px;
-}
-
+  .el-form demo-ruleForm {
+    margin-left: 20px;
+  }
 }
 </style>

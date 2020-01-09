@@ -10,7 +10,7 @@ const userRequest = axios.create({
 
 
   userRequest.interceptors.request.use(function (config) {
-this.config.headers.token=getToken()
+config.headers.token=getToken()
     return config;
   }, function (error) {
 
@@ -20,50 +20,56 @@ this.config.headers.token=getToken()
 
 axios.interceptors.response.use(function (response) {
   
-    return response.data;
+    return response;
   }, function (error) {
     return Promise.reject(error);
   });
 
+  //新增用户信息
 export function addUser(data){
     return userRequest({
-        url: '/user/list',
+        url: '/user/add',
         method: "post",
       
         data,
 
       })
 }
-export function addUser(data){
+//获取用户列表
+export function userList(params){
     return userRequest({
         url: '/user/list',
+        method: "get",
+      
+        params,
+
+      })
+}
+
+//删除用户列表
+export function delUser(data){
+    return userRequest({
+        url: '/user/remove',
         method: "post",
       
         data,
 
       })
 }
-export function addUser(data){
+//切换用户状态
+export function changeUser(data){
     return userRequest({
-        url: '/user/list',
+        url: '/user/status',
         method: "post",
       
         data,
 
       })
 }
-export function addUser(data){
+//编辑用户信息
+export function editUser(data){
     return userRequest({
-        url: '/user/list',
-        method: "post",
-      
-        data,
-
-      })
-}
-export function addUser(data){
-    return userRequest({
-        url: '/user/list',
+        url: '/user/edit',
         method: "post",
       
         data,

@@ -35,7 +35,11 @@
         <el-table-column prop="name" label="学科名称" width="180"></el-table-column>
         <el-table-column prop="short_name" label="简称"></el-table-column>
         <el-table-column prop="username" label="创建者"></el-table-column>
-        <el-table-column prop="create_time" label="创建日期"></el-table-column>
+        <el-table-column prop="create_time" label="创建日期">
+          <template slot-scope="scope">
+            {{scope.row.creat_time | filterTime}}
+          </template>
+        </el-table-column>
         <el-table-column prop="status" label="状态">
           <template slot-scope="scope">
             <span v-if="scope.row.status==0" class="girl">禁用</span>
@@ -119,6 +123,11 @@ export default {
         //成功回调
         window.console.log(res);
         window.console.log("删除成功");
+        if (this.tableData.length==1) {
+          this.page--;
+           this.page=this.page==0?'1':this.page
+        }
+       
         this.listinfo()
       });
     },
