@@ -125,7 +125,7 @@ export default {
         window.console.log("删除成功");
         if (this.tableData.length==1) {
           this.page--;
-           this.page=this.page==0?'1':this.page
+           this.page=this.page==1?'1':this.page
         }
        
         this.listinfo()
@@ -167,7 +167,8 @@ export default {
     listinfo() {
       subjectList({
         page: this.page,
-        limit: this.size
+        limit: this.size,
+        ...this.formInline
       }).then(res => {
         window.console.log(res);
         this.tableData = res.data.items;
@@ -184,7 +185,7 @@ export default {
       }).then(res => {
         window.console.log(res);
         this.tableData = res.data.items;
-        this.total = this.tableData.length;
+        this.total = res.data.pagination.total;
       });
     
     },

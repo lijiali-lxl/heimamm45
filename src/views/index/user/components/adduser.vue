@@ -24,15 +24,15 @@
             <el-option label="学生" value="4"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="状态" :label-width="formLabelWidth">
-        <el-select v-model="useraddfrom.region" placeholder="请选择状态">
+      <el-form-item label="状态" :label-width="formLabelWidth" prop='status'>
+        <el-select v-model="useraddfrom.status" placeholder="请选择状态">
           <el-option label="启用" value="0"></el-option>
           <el-option label="禁用" value="1"></el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="用户备注" :label-width="formLabelWidth" prop=remark>
-        <el-input v-model="useraddfrom.name" autocomplete="off"></el-input>
+        <el-input v-model="useraddfrom.remark" autocomplete="off"></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -77,7 +77,8 @@ export default {
         email: "",
         phone: "",
         role: "",
-        remark:''
+        remark:'',
+        status:''
       },
       rules: {
         username: [
@@ -112,6 +113,8 @@ export default {
               if (res.data.code==200) {
                   this.$message.success('新增成功')
                   this.dialogFormVisible=false
+                  this.$refs.useraddfrom.resetFields()
+                  this.$parent.list()
               }else{
                   this.$message.error(res.data.message)
               }

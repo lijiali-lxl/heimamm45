@@ -3,9 +3,9 @@
     <!-- 饿了吗的卡片 -->
     <!-- 头部 -->
     <el-card class="box-card">
-      <el-form :inline="true" :model="userfrom" class="demo-form-inline">
+      <el-form :inline="true" :model="userfrom" class="demo-form-inline" ref='userfrom'>
         <el-form-item label="用户名称" prop="username">
-          <el-input v-model="userfrom.user"></el-input>
+          <el-input v-model="userfrom.username"></el-input>
         </el-form-item>
         <el-form-item label="用户邮箱" prop="email">
           <el-input v-model="userfrom.email"></el-input>
@@ -20,7 +20,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="search">查询</el-button>
-          <el-button @click="onSubmit">清除</el-button>
+          <el-button @click="clearuser">清除</el-button>
           <el-button type="primary" icon="el-icon-plus" @click="onSubmit">新增用户</el-button>
         </el-form-item>
       </el-form>
@@ -65,11 +65,11 @@
         class="changePag"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="currentPage4"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
+        :current-page="page"
+        :page-sizes="pagesizes"
+        :page-size="size"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="400"
+        :total="total"
       ></el-pagination>
     </el-card>
     <!-- 使用adduser会话框 -->
@@ -95,35 +95,46 @@ export default {
       userfrom: {
         username: "",
         email: "",
-        role_id:''
+        role_id: ""
       },
       tableData: [],
-      //分页插件
-      currentPage1: 5,
-      currentPage2: 5,
-      currentPage3: 5,
-      currentPage4: 4
+      //分页
+      page: 1,
+      pagesizes: [2, 4, 6, 8],
+      size: 2,
+      total: 0
 
       //对话框
     };
   },
   methods: {
     list() {
-      userList().then(res => {
+      userList({
+        page: this.page,
+        limit: this.size,
+        ...this.userfrom
+      }).then(res => {
+        window.console.log(res);
         this.tableData = res.data.data.items;
+        this.total = res.data.data.pagination.total;
       });
     },
     //新增按钮
     onSubmit() {
       this.$refs.adduser.dialogFormVisible = true;
     },
-    //分页
+    //分页点击的容量
     handleSizeChange(val) {
       window.console.log(`每页 ${val} 条`);
+      this.size = val;
+      this.page = 1;
+      this.list();
     },
-    //分页
+    //分页点击的页码
     handleCurrentChange(val) {
       window.console.log(`当前页: ${val}`);
+      this.page = val;
+      this.list();
     },
     //删除按钮
     del(item) {
@@ -143,39 +154,52 @@ export default {
       changeUser({
         id: item.id
       }).then(res => {
-        window.console.log(res)
+        window.console.log(res);
         this.list();
       });
     },
     //编辑按钮
-    edituser(item){
-      this.$refs.edituser.dialogFormVisible=true
-      this.$refs.edituser.usereditfrom=JSON.parse(JSON.stringify(item))
-      if (item.role_id==3) {
-        this.$refs.edituser.usereditfrom.role_id='老师'
-      }else if (item.role_id==2) {
-          this.$refs.edituser.usereditfrom.role_id='管理员'
-      }else if (item.role_id==4){
-         this.$refs.edituser.usereditfrom.role_id='学生'
-      }else if (item.role_id==1){
-         this.$refs.edituser.usereditfrom.role_id='学生'
+    edituser(item) {
+      this.$refs.edituser.dialogFormVisible = true;
+      this.$refs.edituser.usereditfrom = JSON.parse(JSON.stringify(item));
+      if (item.role_id == 3) {
+        this.$refs.edituser.usereditfrom.role_id = "老师";
+      } else if (item.role_id == 2) {
+        this.$refs.edituser.usereditfrom.role_id = "管理员";
+      } else if (item.role_id == 4) {
+        this.$refs.edituser.usereditfrom.role_id = "学生";
+      } else if (item.role_id == 1) {
+        this.$refs.edituser.usereditfrom.role_id = "学生";
       }
-      if (item.status==1) {
-        this.$refs.edituser.usereditfrom.status='启用'
-      }else{
-         this.$refs.edituser.usereditfrom.status='禁用'
+      if (item.status == 1) {
+        this.$refs.edituser.usereditfrom.status = "启用";
+      } else {
+        this.$refs.edituser.usereditfrom.status = "禁用";
       }
-      },
-       //查询按钮
-  search(){
-   this.list(this.userfrom)
-  }
-     
+    },
+    //查询按钮
+    search() {
+      userList({
+        page: this.page,
+        limit: this.size,
+        ...this.userfrom
+      }).then(res => {
+        window.console.log(res);
+        this.tableData = res.data.data.items;
         
-      
+        this.total = res.data.data.pagination.total;
     
-  },
- 
+       
+      });
+      
+    },
+    //点击清除按钮
+  clearuser(){
+    this.$refs.userfrom.resetFields()
+    this.page=1
+    this.list()
+  }
+  }
 };
 </script>
 
