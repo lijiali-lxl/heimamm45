@@ -4,45 +4,45 @@
     <!-- 头部 -->
     <el-card class="box-card">
       <!-- 第一部分 -->
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
+      <el-form :inline="true" :model="questFrom" class="demo-form-inline">
         <el-form-item label="学科">
-          <el-select v-model="formInline.region" placeholder="请选择状态">
+          <el-select v-model="questFrom.region" placeholder="请选择状态">
             <el-option label="已审批" value="shanghai"></el-option>
             <el-option label="待审批" value="beijing"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="阶段">
-          <el-select v-model="formInline.region" placeholder="请选择状态">
+          <el-select v-model="questFrom.region" placeholder="请选择状态">
             <el-option label="已审批" value="shanghai"></el-option>
             <el-option label="待审批" value="beijing"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="企业">
-          <el-select v-model="formInline.region" placeholder="请选择状态">
+          <el-select v-model="questFrom.region" placeholder="请选择状态">
             <el-option label="已审批" value="shanghai"></el-option>
             <el-option label="待审批" value="beijing"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="题型">
-          <el-select v-model="formInline.region" placeholder="请选择状态">
+          <el-select v-model="questFrom.region" placeholder="请选择状态">
             <el-option label="已审批" value="shanghai"></el-option>
             <el-option label="待审批" value="beijing"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
       <!-- 第二部分 -->
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
+      <el-form :inline="true" :model="questFrom" class="demo-form-inline">
         <el-form-item label="难度">
-          <el-select v-model="formInline.region" placeholder="请选择状态">
+          <el-select v-model="questFrom.region" placeholder="请选择状态">
             <el-option label="已审批" value="shanghai"></el-option>
             <el-option label="待审批" value="beijing"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="作者" class="author">
-          <el-input v-model="formInline.user"></el-input>
+          <el-input v-model="questFrom.user"></el-input>
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="formInline.region" placeholder="请选择状态">
+          <el-select v-model="questFrom.region" placeholder="请选择状态">
             <el-option label="已审批" value="shanghai"></el-option>
             <el-option label="待审批" value="beijing"></el-option>
           </el-select>
@@ -53,16 +53,16 @@
             <el-date-picker
               type="date"
               placeholder="选择日期"
-              v-model="ruleForm.date1"
+              v-model="questFrom.date1"
               style="width: 100%;"
             ></el-date-picker>
           </el-form-item>
         </el-form-item>
       </el-form>
       <!-- 第三部分 -->
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
+      <el-form :inline="true" :model="questFrom" class="demo-form-inline">
         <el-form-item label="标题">
-          <el-input v-model="formInline.user" class="title"></el-input>
+          <el-input v-model="questFrom.user" class="title"></el-input>
         </el-form-item>
 
         <el-form-item>
@@ -75,7 +75,7 @@
 
     <!-- 内容 -->
     <el-card>
-      <el-table :data="tableData" stripe style="width: 100%" border="true">
+      <el-table :data="tableData" stripe style="width: 100%" border>
         <el-table-column type="index" label="序号" width="100"></el-table-column>
         <el-table-column prop="date" label="题目" width="180"></el-table-column>
         <el-table-column prop="name" label="学科.阶段" width="180"></el-table-column>
@@ -85,7 +85,7 @@
         <el-table-column prop="date" label="状态"></el-table-column>
         <el-table-column fixed="right" label="访问量" width="120">
           <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small">编辑</el-button>
+            <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
             <el-button type="text" size="small">禁用</el-button>
             <el-button type="text" size="small">删除</el-button>
           </template>
@@ -104,78 +104,25 @@
       ></el-pagination>
     </el-card>
 
-    <!-- 新增对话框 -->
-    <el-dialog title="新增题库测试" :visible.sync="dialogFormVisible" class="addwindow" center>
-      <el-form
-        :model="ruleForm"
-        :rules="rules"
-        ref="ruleForm"
-        label-width="100px"
-        class="demo-ruleForm"
-      >
-        <el-form-item label="学科" prop="role" :label-width="formLabelWidth">
-          <el-select v-model="ruleForm.role" placeholder="请选择角色">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="阶段" prop="role" :label-width="formLabelWidth">
-          <el-select v-model="ruleForm.role" placeholder="请选择角色">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="企业" prop="role" :label-width="formLabelWidth">
-          <el-select v-model="ruleForm.role" placeholder="请选择角色">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="城市" prop="role" :label-width="formLabelWidth">
-          <el-select v-model="ruleForm.role" placeholder="请选择角色">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="题型" prop="resource">
-          <el-radio-group v-model="ruleForm.resource">
-            <el-radio label="单选"></el-radio>
-            <el-radio label="多选"></el-radio>
-            <el-radio label="简答"></el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="难度" prop="resource">
-          <el-radio-group v-model="ruleForm.resource">
-            <el-radio label="简单"></el-radio>
-            <el-radio label="一般"></el-radio>
-            <el-radio label="困难"></el-radio>
-          </el-radio-group>
-        </el-form-item>
-          <el-divider></el-divider>
-           <div>
-        <div ref="editor" style="text-align:left"></div>
-        <button v-on:click="getContent">查看内容</button>
-    </div>
-        <el-form-item label="用户备注" :label-width="formLabelWidth">
-          <el-input v-model="ruleForm.name" autocomplete="off"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="resetForm('ruleForm')">取 消</el-button>
-        <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
-      </div>
-    </el-dialog>
+   <!-- 新增会话框 -->
+   <addquestion ref="addquestion"></addquestion>
+   <editquestion ref="editquestion"></editquestion>
   </div>
 </template>
 
 <script>
-import E from 'wangeditor'
+// import E from 'wangeditor'
+import addquestion from '../question/components/addquestion'
+import editquestion from '../question/components/editquestion'
 export default {
+  components:{
+    addquestion,editquestion
+  },
   data() {
+  
     return {
        editorContent: '',
-      formInline: {
+      questFrom: {
         user: "",
         region: ""
       },
@@ -197,41 +144,13 @@ export default {
       currentPage3: 5,
       currentPage4: 4,
 
-      //对话框
-      dialogTableVisible: false,
-      dialogFormVisible: false,
-      ruleForm: {
-        username: "",
-        email: "",
-        phone: "",
-        role: ""
-      },
-      rules: {
-        username: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ],
-        email: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ],
-        phone: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ],
-        role: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
-        ]
-      },
-      formLabelWidth: "80px"
+     
     };
   },
   methods: {
     //新增按钮
     onSubmit() {
-      this.dialogTableVisible = true;
-      this.dialogFormVisible = true;
+      this.$refs.addquestion.dialogFormVisible = true;
     },
     //分页
     handleSizeChange(val) {
@@ -241,34 +160,16 @@ export default {
     handleCurrentChange(val) {
       window.console.log(`当前页: ${val}`);
     },
-    //点击会话框确定按钮
-    submitForm(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          alert("submit!");
-        } else {
-          window.console.log("error submit!!");
-          return false;
-        }
-      });
+    //编辑按钮
+    edit(item){
+      window.console.log(item)
+      this.$refs.editquestion.dialogFormVisible=true
     },
-    //点击取消按钮
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-      this.dialogFormVisible = false;
-    },
-    // 富文本
-      getContent: function () {
-            alert(this.editorContent)
-        }
+
+
+    
   },
-   mounted() {
-        var editor = new E(this.$refs.editor)
-        editor.customConfig.onchange = (html) => {
-          this.editorContent = html
-        }
-        editor.create()
-      }
+
   
 };
 </script>
