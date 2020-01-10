@@ -179,6 +179,7 @@ export default {
     },
     //查询按钮
     search() {
+      this.page=1
       userList({
         page: this.page,
         limit: this.size,
