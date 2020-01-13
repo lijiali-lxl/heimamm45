@@ -5,7 +5,8 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import './style/base.css'
 import './filter/index.js'
-
+//导入Vuex
+import store from '@/store/index.js'
 
 Vue.use(ElementUI);
 
@@ -22,5 +23,7 @@ window.console.log(process.env.VUE_APP_BASEURL)
 new Vue({
   //挂载
   router,
+  //Vuex
+  store,
   render: h => h(App),
 }).$mount('#app')

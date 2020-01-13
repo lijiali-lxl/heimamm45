@@ -7,8 +7,12 @@
       <el-form :inline="true" :model="questFrom" class="demo-form-inline">
         <el-form-item label="学科">
           <el-select v-model="questFrom.region" placeholder="请选择状态">
-            <el-option label="已审批" value="shanghai"></el-option>
-            <el-option label="待审批" value="beijing"></el-option>
+            <el-option
+              :label="item.short_name"
+              :value="item.id"
+              v-for="(item) in subjectList"
+              :key="item.id"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="阶段">
@@ -19,8 +23,12 @@
         </el-form-item>
         <el-form-item label="企业">
           <el-select v-model="questFrom.region" placeholder="请选择状态">
-            <el-option label="已审批" value="shanghai"></el-option>
-            <el-option label="待审批" value="beijing"></el-option>
+            <el-option
+              :label="item.short_name"
+              :value="item.id"
+              v-for="(item) in enterpriseList"
+              :key="item.id"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="题型">
@@ -77,13 +85,30 @@
     <el-card>
       <el-table :data="tableData" stripe style="width: 100%" border>
         <el-table-column type="index" label="序号" width="100"></el-table-column>
-        <el-table-column prop="date" label="题目" width="180"></el-table-column>
-        <el-table-column prop="name" label="学科.阶段" width="180"></el-table-column>
-        <el-table-column prop="date" label="题型"></el-table-column>
-        <el-table-column prop="date" label="企业"></el-table-column>
-        <el-table-column prop="date" label="创建者"></el-table-column>
-        <el-table-column prop="date" label="状态"></el-table-column>
-        <el-table-column fixed="right" label="访问量" width="120">
+        <el-table-column prop="title" label="题目" width="180">
+          <template slot-scope="scope">
+            <div v-html="scope.row.title"></div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="subject_name" label="学科.阶段" width="180">
+          <template slot-scope="scope">
+            <div>{{scope.row.subject_name+'.'+{1:'初级',2:'中级',3:'高级'}[scope.row.step]}}</div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="type" label="题型">
+          <template slot-scope="scope">
+            <div>{{{1:'单选',2:'多选',3:'简答'}[scope.row.type]}}</div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="enterprise_name" label="企业"></el-table-column>
+        <el-table-column prop="username" label="创建者"></el-table-column>
+        <el-table-column prop="status" label="状态">
+          <template slot-scope="scope">
+            <span v-if="scope.row.status==1">启用</span>
+            <span v-else>禁用</span>
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" prop="reads" label="访问量" width="120">
           <template slot-scope="scope">
             <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
             <el-button type="text" size="small">禁用</el-button>
@@ -96,17 +121,17 @@
         class="changePag"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="currentPage4"
-        :page-sizes="[100, 200, 300, 400]"
+        :current-page="currentPage"
+        :page-sizes="pageSize"
         :page-size="100"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="400"
+        :total="total"
       ></el-pagination>
     </el-card>
 
-   <!-- 新增会话框 -->
-   <addquestion ref="addquestion"></addquestion>
-   <editquestion ref="editquestion"></editquestion>
+    <!-- 新增会话框 -->
+    <addquestion ref="addquestion"></addquestion>
+    <editquestion ref="editquestion"></editquestion>
   </div>
 </template>
 
@@ -114,35 +139,35 @@
 // import E from 'wangeditor'
 import addquestion from '../question/components/addquestion'
 import editquestion from '../question/components/editquestion'
+import {subjectList} from '@/api/subject.js'
+import {entList} from '@/api/enterprise.js'
+import {questionList} from '@/api/question.js'
 export default {
+  name:'question',
   components:{
     addquestion,editquestion
   },
   data() {
   
     return {
+        total:0,
+      currentPage:0,
        editorContent: '',
+       pageSize:[2,4,6,8],
       questFrom: {
         user: "",
         region: ""
       },
       tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄"
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄"
-        }
+       
       ],
       //分页插件
-      currentPage1: 5,
-      currentPage2: 5,
-      currentPage3: 5,
-      currentPage4: 4,
+    
+      //学科信息
+      subjectList:[],
+      //企业信息
+      enterpriseList:[],
+    
 
      
     };
@@ -164,10 +189,75 @@ export default {
     edit(item){
       window.console.log(item)
       this.$refs.editquestion.dialogFormVisible=true
+       const editForm = JSON.parse(JSON.stringify(item));
+       this.$refs.editquestion.editquestionForm=editForm
+       editForm.city = editForm.city.split(',');
+  
+        this.$refs.editquestion.editquestionForm.city= editForm.city
+        this.$refs.editquestion.editquestionForm.multiple_select_answer=  editForm.multiple_select_answer.split(
+        ',');
+        const options=[];
+       editForm.select_options.forEach(v => {
+        if (v.label == 'A') {
+          options[0] = v;
+        } else if (v.label == 'B') {
+          options[1] = v;
+        } else if (v.label == 'C') {
+          options[2] = v;
+        } else {
+          options[3] = v;
+        }
+      });
+          this.$refs.editquestion.editquestionForm.select_options = options;
+          
+      // 挨个的设置 图片 视频地址
+      if (editForm.select_options[0].image != '') {
+        this.$refs.editquestion.imageUrlA =
+          process.env.VUE_APP_BASEURL + '/' + editForm.select_options[0].image;
+      }
+      if (editForm.select_options[1].image != '') {
+        this.$refs.editquestion.imageUrlB =
+          process.env.VUE_APP_BASEURL + '/' + editForm.select_options[1].image;
+      }
+      if (editForm.select_options[2].image != '') {
+        this.$refs.editquestion.imageUrlC =
+          process.env.VUE_APP_BASEURL + '/' + editForm.select_options[2].image;
+      }
+      if (editForm.select_options[3].image != '') {
+        this.$refs.editquestion.imageUrlD =
+          process.env.VUE_APP_BASEURL + '/' + editForm.select_options[3].image;
+      }
+      if (editForm.video != '') {
+        this.$refs.editquestion.videoURL =
+          process.env.VUE_APP_BASEURL + '/' + editForm.video;
+      }
+
     },
 
 
     
+  },
+  created() {
+    //获取学科信息
+    subjectList().then(res=>{
+      window.console.log(res)
+      this.subjectList=res.data.items
+
+    })
+    //获取企业信息
+    entList().then(res=>{
+      this.enterpriseList=res.data.items
+
+    })
+    //获取题库信息
+    questionList({
+      page:this.page,
+      limit:this.size
+    }).then(res=>{
+      this.tableData=res.data.items
+      this.total=res.data.pagination.total
+    })
+
   },
 
   

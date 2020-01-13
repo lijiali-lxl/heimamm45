@@ -1,9 +1,9 @@
 import request from '@/utils/request.js'
 
 //删除学科
-  export function subjectRemove(data){
+  export function questionRemove(data){
     return request({
-        url: '/subject/remove',
+        url: '/question/remove',
         method: "post",
       
         data,
@@ -12,9 +12,9 @@ import request from '@/utils/request.js'
 }
 
 //添加学科
-  export function addSubject(data){
+  export function addquestion(data){
     return request({
-        url: '/subject/add',
+        url: '/question/add',
         method: "post",
       
         data,
@@ -23,9 +23,9 @@ import request from '@/utils/request.js'
 }
 
 //获取学科列表
-  export function subjectList(params){
+  export function questionList(params){
     return request({
-        url: '/subject/list',
+        url: '/question/list',
         method: "get",
       
         params,
@@ -34,9 +34,9 @@ import request from '@/utils/request.js'
 }
 
 //修改学科状态
-  export function subjectStatus(data){
+  export function questionStatus(data){
     return request({
-        url: '/subject/status',
+        url: '/question/status',
         method: "post",
       
         data,
@@ -45,9 +45,9 @@ import request from '@/utils/request.js'
 }
 
 //学科编辑
-  export function subjectEdit(data){
+  export function questionEdit(data){
     return request({
-        url: '/subject/edit',
+        url: '/question/edit',
         method: "post",
       
         data,

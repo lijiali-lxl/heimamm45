@@ -254,7 +254,7 @@ export default {
               //把token存起来
             saveToken(res.data.data.token)
               //路由跳转到首页
-              this.$router.push('/index/chart')
+              this.$router.push('/index')
             } else {
               if (res.data.code == 202) {
                 this.$message.error(res.data.message);

@@ -1,29 +1,4 @@
-import axios from 'axios'
-import {getToken} from  '@/utils/token.js'
-
-
-
-const enterpriseRequest = axios.create({
-    baseURL: process.env.VUE_APP_BASEURL,
-   
-  });
-
-  enterpriseRequest.interceptors.request.use(function (config) {
-   config.headers.token=getToken()
-    return config;
-  }, function (error) {
-
-    return Promise.reject(error);
-  });
-
-
-  enterpriseRequest.interceptors.response.use(function (response) {
-
-    return response.data;
-  }, function (error) {
-  
-    return Promise.reject(error);
-  });
+import enterpriseRequest from '@/utils/request.js'
 
 //新增企业信息
   export function addEnter(data){

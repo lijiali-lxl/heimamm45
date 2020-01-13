@@ -28,7 +28,7 @@
 
     <!-- 内容 -->
     <el-card>
-      <el-table :data="tableData" stripe style="width: 100%">
+      <el-table :data="tableData" stripe style="width: 100%" border >
         <el-table-column type="index" label="序号" width="100"></el-table-column>
         <el-table-column prop="username" label="用户名" width="180"></el-table-column>
         <el-table-column prop="phone" label="电话" width="180"></el-table-column>
@@ -37,6 +37,7 @@
           <template slot-scope="scope">
             <span v-if="scope.row.role_id==2">管理员</span>
             <span v-else-if="scope.row.role_id==3">老师</span>
+            <span v-else-if="scope.row.role_id==1">超级管理员</span>
             <span v-else>学生</span>
             <!-- <span>{{scope.row.role_id}}</span> -->
           </template>
@@ -48,7 +49,7 @@
             <span v-else>禁用</span>
           </template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" width="120">
+        <el-table-column fixed="right" label="操作" width="120" v-if="['超级管理员'].includes($store.state.role)==true">
           <template slot-scope="scope">
             <el-button @click="edituser(scope.row)" type="text" size="small">编辑</el-button>
             <el-button
@@ -74,15 +75,21 @@
     </el-card>
     <!-- 使用adduser会话框 -->
     <adduser ref="adduser"></adduser>
+    <!-- 编辑会话框 -->
     <edituser ref="edituser"></edituser>
   </div>
 </template>
 
 <script>
+//新增组件
 import adduser from "../user/components/adduser";
+//编辑组件
 import edituser from "../user/components/edituser";
+//导入路由
 import { userList, delUser, changeUser } from "@/api/user.js";
+
 export default {
+  //注册组件
   components: {
     adduser,
     edituser
@@ -115,8 +122,8 @@ export default {
         ...this.userfrom
       }).then(res => {
         window.console.log(res);
-        this.tableData = res.data.data.items;
-        this.total = res.data.data.pagination.total;
+        this.tableData = res.data.items;
+        this.total = res.data.pagination.total;
       });
     },
     //新增按钮
@@ -143,7 +150,7 @@ export default {
       }).then(res => {
         window.console.log(res);
         window.console.log("删除成功");
-        if (res.data.code == 200) {
+        if (res.code == 200) {
           this.$message.success("删除成功");
           this.list();
         }
@@ -162,20 +169,7 @@ export default {
     edituser(item) {
       this.$refs.edituser.dialogFormVisible = true;
       this.$refs.edituser.usereditfrom = JSON.parse(JSON.stringify(item));
-      if (item.role_id == 3) {
-        this.$refs.edituser.usereditfrom.role_id = "老师";
-      } else if (item.role_id == 2) {
-        this.$refs.edituser.usereditfrom.role_id = "管理员";
-      } else if (item.role_id == 4) {
-        this.$refs.edituser.usereditfrom.role_id = "学生";
-      } else if (item.role_id == 1) {
-        this.$refs.edituser.usereditfrom.role_id = "学生";
-      }
-      if (item.status == 1) {
-        this.$refs.edituser.usereditfrom.status = "启用";
-      } else {
-        this.$refs.edituser.usereditfrom.status = "禁用";
-      }
+
     },
     //查询按钮
     search() {
@@ -186,9 +180,9 @@ export default {
         ...this.userfrom
       }).then(res => {
         window.console.log(res);
-        this.tableData = res.data.data.items;
+        this.tableData = res.data.items;
         
-        this.total = res.data.data.pagination.total;
+        this.total = res.data.pagination.total;
     
        
       });

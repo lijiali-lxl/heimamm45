@@ -36,36 +36,15 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="resetForm('useraddfrom')">取 消</el-button>
+      <el-button @click="resetForm">取 消</el-button>
       <el-button type="primary" @click="submitForm">确 定</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
-//自定义手机号码校验规则
- var validatephone = (rule, value, callback) => {
-     const reg=/^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/
-        if (value === '') {
-          callback(new Error('请输入密码'));
-        } else {
-          if (reg.test(value)!=true) {
-               callback(new Error('手机号码格式不对噢'));
-          }
-          callback();
-        }
-      };
- var validateemail = (rule, value, callback) => {
-     const reg=/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/
-        if (value === '') {
-          callback(new Error('请输入密码'));
-        } else {
-          if (reg.test(value)!=true) {
-               callback(new Error('邮箱格式不对噢'));
-          }
-          callback();
-        }
-      };
+//导入校验规则
+import {validatephone,validateemail} from '@/utils/rules.js'
 import {addUser}from '@/api/user.js'
 export default {
   data() {
@@ -86,19 +65,18 @@ export default {
           { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
         ],
         email: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { validator: validateemail, trigger: 'blur' }
+          { required: true, validator: validateemail,trigger: "change", },
         ],
         phone: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-                { validator: validatephone, trigger: 'blur' }
+          { required: true,  trigger: "change",validator: validatephone, },
+            
      
      
         ],
-        // role_id: [
-        //   { required: true },
+        role_id: [
+        { required: true, message: "请输入活动名称", trigger: "change" },
          
-        // ],
+        ],
       
       },
       formLabelWidth: "80px"
@@ -110,21 +88,25 @@ export default {
           addUser(this.useraddfrom
           ).then(res=>{
               window.console.log(res)
-              if (res.data.code==200) {
+              if (res.code==200) {
                   this.$message.success('新增成功')
                   this.dialogFormVisible=false
                   this.$refs.useraddfrom.resetFields()
                   this.$parent.list()
               }else{
-                  this.$message.error(res.data.message)
+                  this.$message.error(res.message)
               }
           })
         } else {
-          window.console.log("error submit!!");
+            window.console.log("111");
           return false;
         }
       });
     },
+    resetForm(){
+          this.$refs.useraddfrom.resetFields()
+              this.dialogFormVisible=false
+    }
   },
 };
 </script>

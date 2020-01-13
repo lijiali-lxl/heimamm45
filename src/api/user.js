@@ -1,33 +1,11 @@
-import axios from 'axios'
-import {getToken} from '@/utils/token.js'
-
-const userRequest = axios.create({
-    baseURL:process.env.VUE_APP_BASEURL
-
-    
-  });
+import request from '@/utils/request.js'
 
 
 
-  userRequest.interceptors.request.use(function (config) {
-config.headers.token=getToken()
-    return config;
-  }, function (error) {
-
-    return Promise.reject(error);
-  });
-
-
-axios.interceptors.response.use(function (response) {
-  
-    return response;
-  }, function (error) {
-    return Promise.reject(error);
-  });
 
   //新增用户信息
 export function addUser(data){
-    return userRequest({
+    return request({
         url: '/user/add',
         method: "post",
       
@@ -37,7 +15,7 @@ export function addUser(data){
 }
 //获取用户列表
 export function userList(params){
-    return userRequest({
+    return request({
         url: '/user/list',
         method: "get",
       
@@ -48,7 +26,7 @@ export function userList(params){
 
 //删除用户列表
 export function delUser(data){
-    return userRequest({
+    return request({
         url: '/user/remove',
         method: "post",
       
@@ -58,7 +36,7 @@ export function delUser(data){
 }
 //切换用户状态
 export function changeUser(data){
-    return userRequest({
+    return request({
         url: '/user/status',
         method: "post",
       
@@ -68,7 +46,7 @@ export function changeUser(data){
 }
 //编辑用户信息
 export function editUser(data){
-    return userRequest({
+    return request({
         url: '/user/edit',
         method: "post",
       

@@ -19,16 +19,16 @@
       </el-form-item>
       <el-form-item label="角色" prop="role_id" :label-width="formLabelWidth">
         <el-select v-model="usereditfrom.role_id" placeholder="请选择角色">
-           <!-- <el-option label="超级管理员" value="1"></el-option> -->
-           <el-option label="管理员" value="2"></el-option>
-            <el-option label="老师" value="3"></el-option>
-            <el-option label="学生" value="4"></el-option>
+           <el-option label="超级管理员" :value="1"></el-option>
+           <el-option label="管理员" :value="2"></el-option>
+            <el-option label="老师" :value="3"></el-option>
+            <el-option label="学生" :value="4"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="status" :label-width="formLabelWidth" >
         <el-select v-model="usereditfrom.status" placeholder="请选择状态">
-          <el-option label="启用" value="1"></el-option>
-          <el-option label="禁用" value="0"></el-option>
+          <el-option label="启用" :value="1"></el-option>
+          <el-option label="禁用" :value="0"></el-option>
         </el-select>
       </el-form-item>
 
@@ -44,29 +44,8 @@
 </template>
 
 <script>
-//自定义手机号码校验规则
- var validatephone = (rule, value, callback) => {
-     const reg=/^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/
-        if (value === '') {
-          callback(new Error('请输入密码'));
-        } else {
-          if (reg.test(value)!=true) {
-               callback(new Error('手机号码格式不对噢'));
-          }
-          callback();
-        }
-      };
- var validateemail = (rule, value, callback) => {
-     const reg=/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/
-        if (value === '') {
-          callback(new Error('请输入密码'));
-        } else {
-          if (reg.test(value)!=true) {
-               callback(new Error('邮箱格式不对噢'));
-          }
-          callback();
-        }
-      };
+//导入校验规则
+import {validatephone,validateemail} from '@/utils/rules.js'
 import {editUser}from '@/api/user.js'
 export default {
   data() {
@@ -87,12 +66,12 @@ export default {
           { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
         ],
         email: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { validator: validateemail, trigger: 'blur' }
+          { required: true, trigger: "change",validator: validateemail },
+     
         ],
         phone: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-                { validator: validatephone, trigger: 'blur' }
+          { required: true,  trigger: "change", validator: validatephone},
+          
      
      
         ],
