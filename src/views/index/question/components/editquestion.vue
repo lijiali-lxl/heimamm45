@@ -402,8 +402,9 @@ export default {
           questionEdit(this.editquestionForm).then(res => {
             window.console.log(res)
          if (res.code==200) {
-           this.$message.success('新增成功')
-          //  this.dialogFormVisible=false
+           this.$message.success('编辑成功')
+           this.dialogFormVisible=false
+           this.$parent.getList()
          }
           });
         } else {

@@ -18,7 +18,7 @@
       <el-form-item label="学科" prop="subject" :label-width="formLabelWidth">
         <el-select v-model="addquestionForm.subject" placeholder="请选择学科">
           <el-option
-            :label="item.name"
+            :label="item.short_name"
             :value="item.id"
             v-for="item in $parent.subjectList"
             :key="item.id"
@@ -63,7 +63,7 @@
       <el-divider></el-divider>
       <!-- 试题标题富文本 -->
       <el-form-item label="试题标题" prop="title" :label-width="formLabelWidth">
-      
+      <br>
         <div class="toolbar" ref="toolbar" id="div1"></div>
         <div class="text" ref="text">
           <p>请输入内容</p>
@@ -239,6 +239,7 @@
           :action="uploadURL"
           :on-success="handleVideoSuccess"
           :before-upload="beforeVideoUpload"
+          :show-file-list="false"
         >
           <el-button size="small" type="primary">点击上传</el-button>
           <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
@@ -249,7 +250,7 @@
       <!-- 答案解析富文本 -->
 
       <el-form-item label="答案解析" :label-width="formLabelWidth" prop="answer_analyze">
-      
+      <br>
         <div class="ansuerbar" ref="ansuerbar" id="div2"></div>
         <div class="ansuerbartext" ref="ansuerbartext">
           <p>请输入内容</p>
@@ -345,9 +346,9 @@ export default {
         answer_analyze:''
       },
       rules: {
-        // title: [
-        //   { required: true, message: "请输入活动名称", trigger: "change" }
-        // ],
+        title: [
+          { required: true, message: "请输入活动名称", trigger: "change" }
+        ],
         subject: [
           { required: true, message: "请输入活动名称", trigger: "change" }
         ],
@@ -382,9 +383,9 @@ export default {
         step: [
           { required: true, message: "请输入活动名称", trigger: "change" }
         ],
-        // answer_analyze: [
-        //   { required: true, message: "请输入活动名称", trigger: "change" }
-        // ]
+        answer_analyze: [
+          { required: true, message: "请输入活动名称", trigger: "change" }
+        ]
       },
       formLabelWidth: "120px",
       topeditor: undefined,
@@ -402,8 +403,13 @@ export default {
           addquestion(this.addquestionForm).then(res => {
          if (res.code==200) {
            this.$message.success('新增成功')
-           this.dialogTableVisible=false
-           this.addquestionForm.resetFields()
+           
+           this.$refs.addquestionForm.resetFields()
+           this.$parent.getList()
+           this.topeditor.txt.html('<p>用 JS 设置的内容</p>')
+           this.ansuer.txt.html('<p>用 JS 设置的内容</p>')
+           this.videoURL=''
+           this.dialogFormVisible=false
          }
           });
         } else {

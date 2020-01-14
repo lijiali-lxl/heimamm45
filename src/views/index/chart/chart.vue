@@ -36,84 +36,87 @@
 
 <script>
 import echarts from "echarts";
-import {getChart,entChart} from '@/api/chart.js'
+import { getChart, entChart } from "@/api/chart.js";
 export default {
-    data() {
-        return {
-            datainfro:{}
-        }
-    },
-  mounted() {
-    // 基于准备好的dom，初始化echarts实例
-    const myChart = echarts.init(this.$refs.main);
-    // 使用刚指定的配置项和数据显示图表。
-    const option = {
-      title: {
-        text: "整体数据",
-        textStyle: {
-          color: "#235894"
-        }
-      },
-      tooltip: {
-        trigger: "item",
-        formatter: "{a} <br/>{b}: {c} ({d}%)"
-      },
-      legend: {
-        orient: "vertical",
-        left: 1400,
-        data: ["黑马", "阿里", "京东"]
-      },
-       color : [ 'rgba(247, 97, 55)', 'rgba(249, 179, 88)', 'rgba(64, 158, 255)' ],
-      series: [
-        {
-          name: "黑马",
-          type: "pie",
-          radius: ["50%", "70%"],
-          avoidLabelOverlap: false,
-          label: {
-            normal: {
-              show: false,
-              position: "center"
-            },
-            emphasis: {
-              show: true,
-              textStyle: {
-                fontSize: "30",
-                fontWeight: "bold"
-              }
-            }
-          },
-          labelLine: {
-            normal: {
-              show: false
-            }
-          },
-          data: [
-            { value: 335, name: "黑马" },
-            { value: 310, name: "阿里" },
-            { value: 234, name: "京东" }
-          ]
-        }
-      ]
+  data() {
+    return {
+      datainfro: {},
+      data: []
     };
-    myChart.setOption(option);
+  },
+  mounted() {
+    //调用企业数据接口
+    entChart().then(res => {
+      window.console.log(res);
+  
+      window.console.log("企业数据");
+      const myChart = echarts.init(this.$refs.main);
+      const newarr=res.data.map(v=>{
+        return v.name
+      })
+      // 使用刚指定的配置项和数据显示图表。
+      const option = {
+        title: {
+          text: "整体数据",
+          textStyle: {
+            color: "#235894"
+          }
+        },
+        tooltip: {
+          trigger: "item",
+          formatter: "{a} <br/>{b}: {c} ({d}%)"
+        },
+        legend: {
+          orient: "vertical",
+          left: 1400,
+          data:newarr
+        },
+        color: [
+          "rgba(247, 97, 55)",
+          "rgba(249, 179, 88)",
+          "rgba(64, 158, 255)",
+          "rgba(164, 88, 255)"
+        ],
+        series: [
+          {
+            name: "访问来源",
+            type: "pie",
+            radius: ["50%", "70%"],
+            avoidLabelOverlap: false,
+            label: {
+              normal: {
+                show: false,
+                position: "center"
+              },
+              emphasis: {
+                show: true,
+                textStyle: {
+                  fontSize: "30",
+                  fontWeight: "bold"
+                }
+              }
+            },
+            labelLine: {
+              normal: {
+                show: false
+              }
+            },
+            data: res.data
+          }
+        ]
+      };
+      myChart.setOption(option);
+    });
+    // 基于准备好的dom，初始化echarts实例
   },
   //获取数据列表
- created() {
-    getChart().then(res=>{
-        window.console.log(res)
-        this.datainfro=res.data
-        window.console.log(this.datainfro)
-
-
-        //调用企业数据接口
-       entChart().then(res=>{
-           window.console.log(res)
-           window.console.log('企业数据')
-       })
-    })
-    
- },
+  created() {
+    getChart().then(res => {
+      window.console.log(res);
+      this.datainfro = res.data;
+      window.console.log(this.datainfro);
+    });
+  }
 };
 </script>
 
